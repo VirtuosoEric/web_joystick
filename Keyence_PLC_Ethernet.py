@@ -1,0 +1,261 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import socket,time,random
+
+
+class Keyence_PLC_Ethernet:
+
+    def __init__(self,ip,port):
+        connedted = False
+        while not connedted:
+            try:
+                print ('waiting for connect...')
+                self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.server.settimeout(3)
+                self.server.connect((ip, port))
+                print (ip + ' connected!')
+                connedted = True
+                self.id = random.randint(0,99)
+                print(str(self.id))
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                print("WARNING Connecttime is over!!!\r\n")
+                print("Please reconnect thx\r\n")
+            time.sleep(1)
+
+
+    def force_set(self,register_type,register_id):
+        for i in range(0,3,1):
+            try:   
+                SET = "ST" + "20".decode("hex") + register_type + register_id + "0D".decode("hex")
+                # SET = "ST" + ' ' + register_type + register_id + "0D".decode("hex")
+                self.server.sendall(SET)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx 
+
+                if Rx == "OK\r\n" :
+                    print ("force_set OK")
+                elif Rx == "E1\r\n":
+                    print ("Command error")
+                elif Rx == "E0\r\n":
+                    print ("Register number error")
+                return 
+            
+            except socket.error as e:            
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(SET)
+
+             
+          
+            
+    def force_reset(self,register_type,register_id):
+        for i in range(0,3,1):
+            try:
+                RESET = "RS" + "20".decode("hex") + register_type + register_id + "0D".decode("hex")
+                self.server.sendall(RESET)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx 
+
+                if Rx == "OK\r\n" :
+                    print "force_reset OK"
+                elif Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+                
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(RESET)
+
+
+
+    def continous_force_set(self,register_type,start_register_id,number):
+        for i in range(0,3,1):
+            try:
+                SETS = "STS" + "20".decode("hex") + register_type + start_register_id + "20".decode("hex") + number + "0D".decode("hex")
+                self.server.sendall(SETS)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx 
+
+                if Rx == "OK\r\n" :
+                    print "continous_force_set OK"
+                elif Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:           
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(SETS)
+
+
+    def continous_force_reset(self,register_type,start_register_id,number):
+        for i in range(0,3,1):
+            try:
+                RESETS = "RSS" + "20".decode("hex") + register_type + start_register_id + "20".decode("hex") + number + "0D".decode("hex")
+                self.server.sendall(RESETS)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx 
+
+                if Rx == "OK\r\n" :
+                    print "continous_force_reset OK"
+                elif Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(RESETS)
+
+    def data_read(self,register_type,register_id):
+        for i in range(0,3,1):
+            try:
+                READ = "RD" + "20".decode("hex") + register_type + register_id + "0D".decode("hex")
+                self.server.sendall(READ)
+                time.sleep(0.2)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx
+                print 'The register value is : ' + Rx 
+
+                if Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(READ)
+
+        # 繼電器*2 R（可省略） 00000~199915*4 （位） 0001~1000 0001~0500
+        # 鏈路繼電器B 0000~7FFF （位） 0001~1000 0001~0500
+        # 內部輔助繼電器*2 MR 00000~399915*3 （位） 0001~1000 0001~0500
+        # 鎖存繼電器*2 LR 00000~99915 （位） 0001~1000 0001~0500
+        # 控制繼電器CR 0000~7915 （位） 0001~1000 0001~0500
+        # 工作繼電器VB 0000~F9FF （位） 0001~1000 0001~0500
+        # 資料記憶體*2 DM 00000~65534 .U 0001~1000 0001~0500
+
+
+    def consecutive_data_read(self,register_type, start_register_id,number):
+        for i in range(0,3,1):
+            try:
+                READS = "RDS" + "20".decode("hex") + register_type + start_register_id + "20".decode("hex") + number + "0D".decode("hex")
+                self.server.sendall(READS)
+                time.sleep(0.2)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx
+                print 'The registers value are : ' + Rx 
+
+                if Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(READS)
+
+        # data_format 
+        # .U : Decimal, 16bit, unsigned 
+        # .S : Decimal, 16bit, signed 
+        # .D : Decimal, 32bit, unsigned 
+        # .L : Decimal, 32bit, signed 
+        # .H : Hex, 16bit
+
+    def write_data(self,register_type,register_id,data_format,data):
+        for i in range(0,3,1):
+            try:
+                WRITE = "WR"+"20".decode("hex")+register_type+register_id+data_format+"20".decode("hex")+data+"0D".decode("hex")
+                self.server.sendall(WRITE)
+                time.sleep(0.2)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx
+
+                if Rx == "OK\r\n" :
+                    print "write_data OK"
+                elif Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(WRITE)
+
+    def consecutive_write_data(self,register_type,start_register_id,data_format,data_list):
+      
+        for i in range(0,3,1):
+            try:
+                # data_list = amount+' '+value1+' '+value2+' '+value3
+                b = len(data_list)
+                c = str(b)
+                data_list.insert(0,c)
+                
+                space = ' '
+                data_list = space.join(data_list)
+                
+                WRITES = "WRS"+"20".decode("hex")+register_type+start_register_id+data_format+"20".decode("hex")+data_list+"0D".decode("hex")
+                self.server.sendall(WRITES)
+                time.sleep(0.2)
+                Rx = self.server.recv(1024)
+                self.rec_msg = Rx
+
+                print (str(self.id)+' send')
+
+                if Rx == "OK\r\n" :
+                    print "write_data OK"
+                elif Rx == "E1\r\n":
+                    print "Command error"
+                elif Rx == "E0\r\n":
+                    print "Register number error"
+                return
+
+            except socket.error as e:
+                print("Error -->"+str(e))
+                # plc.force_set(register_type,register_id) 危險
+                self.server.sendall(WRITES)
+
+
+
+
+
+if __name__ =='__main__':
+    plc = Keyence_PLC_Ethernet('192.168.4.101',8501)
+    # input_msg = raw_input()
+    # plc.force_set('MR','4')
+
+    # a = ['99','88','77']
+
+    # plc.consecutive_write_data('CM','7002','.U',a)
+
+    # plc.continous_force_reset('R','506','3')
+
+    # plc.write_data('DM','101','.L','100') #油門 (100~-100)
+    # plc.write_data('DM','103','.L','10') #方向  (20~-20)
+
+    a = -20
+    while a < 20: 
+        # plc.write_data('DM','101','.L','100') #油門 (100~-100)
+        # plc.write_data('DM','103','.L',str(a)) #方向  (20~-20)
+        data = ['-70',str(a)]
+        plc.consecutive_write_data('DM','101','.L',data)
+        a = a + 5
+        time.sleep(0.3)
+      
+
+        

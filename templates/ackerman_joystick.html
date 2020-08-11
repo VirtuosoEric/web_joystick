@@ -56,7 +56,7 @@
             socket.on('connect', function () {setInterval(
                 function () {
                     socket.emit('joystick_event', 
-                    { throttle: Joy1.GetX(), steering: Joy2.GetY() });},100)
+                    { steering: Joy1.GetX(), throttle: Joy2.GetY() });},200)
             });
         });
     </script>
