@@ -1,0 +1,10 @@
+[Unit]
+Description=Web Joystick Service
+
+[Service]
+WorkingDirectory=/home/pi/web_joystick
+ExecStart=/usr/bin/python2.7 ./web_joystick.py
+User=pi
+
+[Install]
+WantedBy=multi-user.target
