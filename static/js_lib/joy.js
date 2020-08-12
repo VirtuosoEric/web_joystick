@@ -79,9 +79,9 @@ var JoyStick = (function(container, parameters)
 	
 	var pressed = 0; // Bool - 1=Yes - 0=No
     var circumference = 2 * Math.PI;
-	var internalRadius = (canvas.width-((canvas.width/2)+10))/2;
-	var maxMoveStick = internalRadius + 5;
-	var externalRadius = internalRadius + 30;
+	var internalRadius = canvas.width*0.15
+	var externalRadius = canvas.width*0.45
+	var maxMoveStick = internalRadius;
 	var centerX = canvas.width / 2;	
 	var centerY = canvas.height / 2;
 	var directionHorizontalLimitPos = canvas.width / 10;
@@ -297,7 +297,7 @@ var JoyStick = (function(container, parameters)
 	 */
 	this.GetX = function ()
 	{
-		return (100*((movedX - centerX)/maxMoveStick)).toFixed();
+		return (100*((movedX - centerX)/(canvas.width*0.5 - maxMoveStick))).toFixed();
 	};
 
 	/**
@@ -306,7 +306,7 @@ var JoyStick = (function(container, parameters)
 	 */
 	this.GetY = function ()
 	{
-		return ((100*((movedY - centerY)/maxMoveStick))*-1).toFixed();
+		return ((100*((movedY - centerY)/(canvas.height*0.5 - maxMoveStick)))*-1).toFixed();
 	};
 	
 	/**
