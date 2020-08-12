@@ -8,7 +8,7 @@ class BaseDriver:
     
     def __init__(self):
         self.max_throttle = 30
-        self.max_steering = 20
+        self.max_steering = 60
         self.last_time = 0
         self.steering_cmd = 0.0
         self.throttle_cmd = 0.0
