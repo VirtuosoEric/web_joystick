@@ -7,7 +7,7 @@ import time,threading,random
 class BaseDriver:
     
     def __init__(self):
-        self.max_throttle = 50
+        self.max_throttle = 30
         self.max_steering = 20
         self.last_time = 0
         self.steering_cmd = 0.0
