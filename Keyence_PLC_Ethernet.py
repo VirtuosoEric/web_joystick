@@ -235,9 +235,10 @@ class Keyence_PLC_Ethernet:
 
 
 if __name__ =='__main__':
-    plc = Keyence_PLC_Ethernet('192.168.4.101',8501)
+    plc = Keyence_PLC_Ethernet('192.168.30.15',8501)
     # input_msg = raw_input()
-    # plc.force_set('MR','4')
+    plc.force_set('MR','504')
+    plc.force_reset('MR','504')
 
     # a = ['99','88','77']
 
@@ -248,14 +249,14 @@ if __name__ =='__main__':
     # plc.write_data('DM','101','.L','100') #油門 (100~-100)
     # plc.write_data('DM','103','.L','10') #方向  (20~-20)
 
-    a = -20
-    while a < 20: 
+    # a = -20
+    # while a < 20: 
         # plc.write_data('DM','101','.L','100') #油門 (100~-100)
         # plc.write_data('DM','103','.L',str(a)) #方向  (20~-20)
-        data = ['-70',str(a)]
-        plc.consecutive_write_data('DM','101','.L',data)
-        a = a + 5
-        time.sleep(0.3)
+        # data = ['-70',str(a)]
+        # plc.consecutive_write_data('DM','101','.L',data)
+        # a = a + 5
+        # time.sleep(0.3)
       
 
         
